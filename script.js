@@ -1,4 +1,4 @@
-
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 function gameboard (){
     
@@ -17,6 +17,31 @@ function gameboard (){
             console.log(boardArray[i] + ",");
             
         }
+    }
+
+    const makeBotMove = () => {
+        //reason and make bot move
+        let moveMade = false;
+        //random move 
+        //num between 1-8
+
+        while(!moveMade){
+            moveInt = Math.floor(Math.random() * 7) + 1;
+            moveInt = moveInt - 1;
+            
+            if(boardArray[moveInt] == 0){
+                console.log("moveInt is" + moveInt);
+                boardArray[moveInt] = -1;
+                checkWin();
+                return true;
+            }
+        }
+
+
+
+
+
+
     }
 
 
@@ -82,6 +107,13 @@ function gameboard (){
                 return true;
             }
 
+            sum = boardArray[0] + boardArray[4] + boardArray[8];
+            if(sum == 3 || sum == -3){
+                console.log("diagonal winner");
+                return true;
+            }
+
+
 
 
 
@@ -115,18 +147,115 @@ function gameboard (){
     
 
 
-    return {boardArray,printGameBoard, getGameboard, checkWin, makeMove};
+    return {boardArray,printGameBoard, getGameboard, checkWin, makeMove, makeBotMove};
 
 }
 
 
 function Game(){
     gameBoard = gameboard();
-
     const getGameboardObj = () => gameBoard;
-    gameBoard.checkWin();
+    let isPlayersTurn = true;
+    const getisPlayersTurn = () => isPlayersTurn;
+    const setisPlayersTurn = (turnIndicator) =>{
+        isPlayersTurn = turnIndicator;
+    }
+    const createBoardDisplay = () => {
+        const boardArray = gameBoard.getGameboard()
+        const gameArea = document.getElementsByClassName("gameArea")[0];
+        const board = document.createElement("div");
+        board.setAttribute("class", "board");
     
+    
+        //create/display visual board
 
+        for(let i = 0; i < boardArray.length; i++){
+            
+            const boardSquare = document.createElement("button");
+            boardSquare.setAttribute("class", "board-square");
+            boardSquare.setAttribute("id","id" + i);
+            const pieceIndicator = document.createElement("p");
+            boardSquare.appendChild(pieceIndicator);
+                
+            board.appendChild(boardSquare);
+            boardSquare.addEventListener("click", async function(){
+                if(isPlayersTurn){
+                    let squareInt = parseInt(boardSquare.getAttribute("id")[2]);
+                    if(gameBoard.makeMove(squareInt)){
+                        isPlayersTurn = false;
+                        updateBoardDisplay();
+                        const turnArea = document.getElementsByClassName("turn-area")[0];
+                        turnArea.textContent = "BOT'S TURN";
+                        if(gameBoard.checkWin()){
+                            //game over. display winner
+                            const gameArea = document.getElementsByClassName("gameArea")[0];
+                            const turnArea = document.getElementsByClassName("turn-area")[0];
+                            turnArea.textContent = "You Win!";
+                            gameArea.appendChild(winnerDisplay);
+                        }else{
+
+                            await sleep(1500);
+                            gameBoard.makeBotMove();
+                            console.log("bot move made");
+                            updateBoardDisplay();
+                            turnArea.textContent = "YOUR TURN";
+                            isPlayersTurn = true;
+                        
+
+                        }
+        
+                    }else{
+                        return;
+                    }
+                    updateBoardDisplay();
+                }
+    
+    
+    
+            });
+            console.log("square appended!");
+    
+    
+            
+           
+        }
+        gameArea.appendChild(board);
+    
+    
+    
+    
+    }
+
+    const updateBoardDisplay = () => {
+        const boardArray = gameBoard.getGameboard()
+        const gameArea = document.getElementsByClassName("gameArea")[0];
+        const board = document.getElementsByClassName("board")[0];
+        if(!board){
+            return
+        }else{
+            for(let i = 0; i < boardArray.length; i++){
+                const currSquare = document.getElementById(("id"+i));
+                if(boardArray[i] == 1){
+                    currSquare.firstChild.textContent = "X";
+                }else if (boardArray[i] == -1){
+                    currSquare.firstChild.textContent = "O";
+                    console.log("bot move shown");
+                
+                }
+                
+
+
+
+            }
+        }
+
+
+    }
+   
+
+    let display = createBoardDisplay();
+
+    
     /*
     gameBoard.printGameBoard();
     gameBoard.makeMove(3);
@@ -151,13 +280,13 @@ function Game(){
 
 
 
+    
 
 
 
 
 
-
-    return {getGameboardObj}
+    return {getGameboardObj, getisPlayersTurn, setisPlayersTurn}
 
 }
 
@@ -165,9 +294,8 @@ function Game(){
 
 
 myGame = Game();
+
 console.log("created game");
-handleDisplay(myGame.getGameboardObj());
-console.log("display");
 
 function CreatePlayer(name){
     return {name}
@@ -178,44 +306,3 @@ player = CreatePlayer("Player 1");
 
 
 
-function handleDisplay(gameBoard){
-    const boardArray = gameBoard.getGameboard()
-    const gameArea = document.getElementsByClassName("gameArea")[0];
-    const board = document.createElement("div");
-    board.setAttribute("class", "board");
-
-
-    //create visual board
-    for(let i = 0; i < boardArray.length; i++){
-        
-        const boardSquare = document.createElement("button");
-        boardSquare.setAttribute("class", "board-square");
-        boardSquare.setAttribute("id","id" + i);
-        const pieceIndicator = document.createElement("p");
-        boardSquare.appendChild(pieceIndicator);
-            
-        board.appendChild(boardSquare);
-        boardSquare.addEventListener("click", function(){
-            let squareInt = parseInt(boardSquare.getAttribute("id")[2]);
-            if(gameBoard.makeMove(squareInt)){
-                boardSquare.firstChild.textContent = "X";
-
-            }else{
-                return;
-            }
-
-
-
-        });
-        console.log("square appended!");
-
-
-        
-       
-    }
-    gameArea.appendChild(board);
-
-
-
-
-}

@@ -5,20 +5,23 @@ html, body{
     margin: 0;
     padding: 0;
     overflow: hidden;
+    background-color: #000000;
 }
 
 .header{
     align-self: center;
     justify-self: center;
-    border-bottom: 10px solid black;
+    color:#fdfdfd;
 }
 
 
 .gameArea{
-    background-color: aqua;
+    background-color: #333333;
     height: 100%;
     display: flex;
     justify-content: center;
+    flex-direction: column;
+
 }
 
 .board{
@@ -36,8 +39,8 @@ html, body{
 
 .board-square{
     
-    background-color: red;
-    border: 5px solid black;
+    background-color: #333333;
+    border: 5px solid rgb(255, 255, 255);
     min-width: 100px;
     max-width: 100px;
     min-height: 100px;
@@ -56,8 +59,17 @@ html, body{
 .board-square > *{
     align-self: center;
     justify-self: center;
-    background-color: rgb(255, 255, 255);
-    font-size: clamp(10pt, 5vmin, 20pt);
+    background-color: #333333;
+    font-size: clamp(10pt, 10vmin, 30pt);
+    color: white;
+}
+
+.turn-area{
+    justify-self: center;
+    align-self: center;
+    font-size: 30pt;
+    margin-bottom: 50px;
+    color: white;
 }
 
 #id0{
@@ -99,3 +111,4 @@ html, body{
     border-bottom: none;
     border-right: none;
 }
+
